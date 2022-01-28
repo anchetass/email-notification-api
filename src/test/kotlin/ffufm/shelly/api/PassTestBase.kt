@@ -2,9 +2,6 @@ package ffufm.shelly.api
 
 import de.ffuf.pass.common.security.SpringContext
 import de.ffuf.pass.common.security.SpringSecurityAuditorAware
-import ffufm.shelly.api.repositories.todo.TodoToDoRepository
-import ffufm.shelly.api.repositories.user.UserUserRepository
-import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,20 +19,8 @@ abstract class PassTestBase {
     @Autowired
     lateinit var context: ApplicationContext
 
-    @Autowired
-    lateinit var todoToDoRepository: TodoToDoRepository
-
-    @Autowired
-    lateinit var userUserRepository: UserUserRepository
-
     @Before
     fun initializeContext() {
         SpringContext.context = context
-    }
-
-    @After
-    fun cleanRepositories(){
-        todoToDoRepository.deleteAll()
-        userUserRepository.deleteAll()
     }
 }
