@@ -34,46 +34,46 @@ class UserUserHandlerTest : PassTestBase() {
         userUserRepository.deleteAll()
     }
 
-    @Test
-    @WithMockUser
-    fun `test create`() {
-        val body: UserUser = UserUser()
-                mockMvc.post("/users/") {
-                    accept(MediaType.APPLICATION_JSON)
-                    contentType = MediaType.APPLICATION_JSON
-                    content = objectMapper.writeValueAsString(body)
-                }.andExpect {
-                    status { isOk }
-                    
-                }
-    }
-
-    @Test
-    @WithMockUser
-    fun `test remove`() {
-        val id: Long = 0
-                mockMvc.delete("/users/{id}/", id) {
-                    accept(MediaType.APPLICATION_JSON)
-                    contentType = MediaType.APPLICATION_JSON
-                    
-                }.andExpect {
-                    status { isOk }
-                    
-                }
-    }
-
-    @Test
-    @WithMockUser
-    fun `test update`() {
-        val body: UserUser = UserUser()
-        val id: Long = 0
-                mockMvc.put("/users/{id}/", id) {
-                    accept(MediaType.APPLICATION_JSON)
-                    contentType = MediaType.APPLICATION_JSON
-                    content = objectMapper.writeValueAsString(body)
-                }.andExpect {
-                    status { isOk }
-                    
-                }
-    }
+//    @Test
+//    @WithMockUser
+//    fun `test create`() {
+//        val body: UserUser = UserUser()
+//                mockMvc.post("/users/") {
+//                    accept(MediaType.APPLICATION_JSON)
+//                    contentType = MediaType.APPLICATION_JSON
+//                    content = objectMapper.writeValueAsString(body)
+//                }.andExpect {
+//                    status { isOk }
+//
+//                }
+//    }
+//
+//    @Test
+//    @WithMockUser
+//    fun `test remove`() {
+//        val id: Long = 0
+//                mockMvc.delete("/users/{id}/", id) {
+//                    accept(MediaType.APPLICATION_JSON)
+//                    contentType = MediaType.APPLICATION_JSON
+//
+//                }.andExpect {
+//                    status { isOk }
+//
+//                }
+//    }
+//
+//    @Test
+//    @WithMockUser
+//    fun `test update`() {
+//        val body: UserUser = UserUser()
+//        val id: Long = 0
+//                mockMvc.put("/users/{id}/", id) {
+//                    accept(MediaType.APPLICATION_JSON)
+//                    contentType = MediaType.APPLICATION_JSON
+//                    content = objectMapper.writeValueAsString(body)
+//                }.andExpect {
+//                    status { isOk }
+//
+//                }
+//    }
 }
