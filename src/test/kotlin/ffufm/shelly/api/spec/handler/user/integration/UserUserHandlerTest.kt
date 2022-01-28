@@ -20,19 +20,10 @@ import org.springframework.test.web.servlet.put
 
 class UserUserHandlerTest : PassTestBase() {
     @Autowired
-    private lateinit var userUserRepository: UserUserRepository
-
-    @Autowired
     private lateinit var objectMapper: ObjectMapper
 
     @Autowired
     private lateinit var mockMvc: MockMvc
-
-    @Before
-    @After
-    fun cleanRepositories() {
-        userUserRepository.deleteAll()
-    }
 
 //    @Test
 //    @WithMockUser
