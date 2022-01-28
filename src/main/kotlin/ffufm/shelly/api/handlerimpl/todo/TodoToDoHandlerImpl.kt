@@ -25,7 +25,7 @@ class TodoToDoHandlerImpl : PassDatabaseHandler<TodoToDo, TodoToDoRepository>(),
      * Create ToDo: Creates a new ToDo object
      * HTTP Code 201: The created ToDo
      */
-    override suspend fun create(body: TodoToDoDTO): TodoToDoDTO {
+    override suspend fun create(body: TodoToDoDTO, id: Long): TodoToDoDTO {
         if (body.status !in Statuses.values().map { it.value }) {
             throw ResponseStatusException(
                 HttpStatus.UNPROCESSABLE_ENTITY,

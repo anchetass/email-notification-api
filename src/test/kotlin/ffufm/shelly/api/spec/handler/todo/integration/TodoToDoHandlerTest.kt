@@ -8,6 +8,7 @@ import org.hamcrest.CoreMatchers
 import org.junit.After
 import org.junit.Before
 import ffufm.shelly.api.spec.handler.utils.EntityGenerator
+import ffufm.shelly.api.utils.Statuses
 import org.junit.Test
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,29 +36,34 @@ class TodoToDoHandlerTest : PassTestBase() {
     @Test
     @WithMockUser
     fun `create todo should return 200`() {
+        val user = userUserRepository.save(EntityGenerator.createUser())
+        val body = EntityGenerator.createTodo().copy(
+            user = user
+        )
 
-        val body = EntityGenerator.createTodo()
-
-        mockMvc.post("/api/todos/") {
+        mockMvc.post("/todos/${user.id}/") {
             accept(MediaType.APPLICATION_JSON)
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(body)
-        }.andExpect { status { isOk() } }
+        }.asyncDispatch().andExpect { status { isOk() } }
     }
-
-
 
     @Test
     fun `update todo should return 200`() {
 
-        val todo = todoToDoRepository.save(EntityGenerator.createTodo())
+        val user = userUserRepository.save(EntityGenerator.createUser())
+        val body = todoToDoRepository.save(
+            EntityGenerator.createTodo().copy(
+                user = user
+            )
+        )
 
-        val updatedTodo = todo.copy(
+        val updatedTodo = body.copy(
             description = "Maganda",
             status = "Completed",
         )
 
-        mockMvc.put("/api/todos/${todo.id!!}/") {
+        mockMvc.put("/todos/${body.id!!}/") {
             accept(MediaType.APPLICATION_JSON)
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(updatedTodo)
@@ -65,17 +71,20 @@ class TodoToDoHandlerTest : PassTestBase() {
     }
 
 
-
-
     @Test
     fun `delete todo should return 200`() {
 
-        val todo = todoToDoRepository.save(EntityGenerator.createTodo())
+        val user = userUserRepository.save(EntityGenerator.createUser())
+        val body = todoToDoRepository.save(
+            EntityGenerator.createTodo().copy(
+                user = user
+            )
+        )
 
-        mockMvc.delete("/api/todos/${todo.id!!}/") {
+        mockMvc.delete("/todos/${body.id!!}/") {
             accept(MediaType.APPLICATION_JSON)
             contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(todo)
+            content = objectMapper.writeValueAsString(body)
         }.andExpect { status { isOk() } }
     }
 
@@ -83,12 +92,26 @@ class TodoToDoHandlerTest : PassTestBase() {
     @Test
     fun `get todo should return all todos`() {
 
-        val todo = todoToDoRepository.save(EntityGenerator.createTodo())
+        val user = userUserRepository.save(EntityGenerator.createUser())
+        val body = EntityGenerator.createTodo().copy(
+            user = user
+        )
 
-        mockMvc.get("/api/todos/") {
+        val maxResults = 100
+        val page = 0
+
+        todoToDoRepository.saveAll(
+            listOf(
+                body,
+                body.copy(
+                    status = Statuses.COMPLETED.value
+                )
+            )
+        )
+
+        mockMvc.get("/todos/?page=$page&maxResult=$maxResults") {
             accept(MediaType.APPLICATION_JSON)
             contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(todo)
         }.andExpect { status { isOk() } }
     }
 

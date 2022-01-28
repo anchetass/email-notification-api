@@ -5,6 +5,7 @@ import ffufm.shelly.api.repositories.todo.TodoToDoRepository
 import ffufm.shelly.api.spec.dbo.todo.TodoToDo
 import ffufm.shelly.api.spec.handler.todo.TodoToDoDatabaseHandler
 import ffufm.shelly.api.spec.handler.utils.EntityGenerator
+import ffufm.shelly.api.utils.Statuses
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -20,23 +21,29 @@ class TodoToDoDatabaseHandlerTest : PassTestBase() {
 
     @Test
     fun `create should return todo`() = runBlocking {
-        assertEquals(0, todoToDoRepository.findAll().count())
-        val todo = EntityGenerator.createTodo().toDto()
-        val createdTodo = todoToDoDatabaseHandler.create(todo)
+        val user = userUserRepository.save(EntityGenerator.createUser())
+        val todo = EntityGenerator.createTodo().copy(
+            user = user
+        ).toDto()
+        val createdTodo = todoToDoDatabaseHandler.create(todo, user.id!!)
 
-        assertEquals(1, todoToDoRepository.findAll().count())
         assertEquals(todo.description, createdTodo.description)
         assertEquals(todo.status, createdTodo.status)
+        assertEquals(1, todoToDoRepository.findAll().count())
+
     }
 
 
     @Test
     fun `remove todo should work`() = runBlocking {
-        val todo = EntityGenerator.createTodo()
-        val createdTodo = todoToDoRepository.save(todo)
+        val user = userUserRepository.save(EntityGenerator.createUser())
 
-        assertEquals(1,  todoToDoRepository.findAll().count())
-        todoToDoDatabaseHandler.remove(createdTodo.id!!)
+        val todo = todoToDoRepository.save(
+            EntityGenerator.createTodo().copy(
+                user = user
+            )
+        )
+        todoToDoDatabaseHandler.remove(todo.id!!)
         assertEquals(0,  todoToDoRepository.findAll().count())
     }
 
@@ -47,24 +54,27 @@ class TodoToDoDatabaseHandlerTest : PassTestBase() {
         val exception = assertFailsWith<ResponseStatusException> {
             todoToDoDatabaseHandler.remove(id)
         }
-        val expectedException = "404 NOT_FOUND \"TodoTodo with ID $id not found\""
+        val expectedException = "404 NOT_FOUND \"TodoToDo with ID 12345 not found\""
         assertEquals(expectedException, exception.message)
     }
 
 
-
-
     @Test
     fun `update todo should return updated todo given valid inputs`() = runBlocking {
-        val todo = EntityGenerator.createTodo()
-        val original = todoToDoRepository.save(todo)
+        val user = userUserRepository.save(EntityGenerator.createUser())
 
-        val body= original.copy(
-            description = "Assignment 2",
-            status = "On going",
+        val todo = todoToDoRepository.save(
+            EntityGenerator.createTodo().copy(
+                user = user
+            )
         )
 
-        val updatedToDo = todoToDoDatabaseHandler.update(body.toDto(), original.id!!)
+        val body= todo.copy(
+            description = "Assignment 2",
+            status = Statuses.COMPLETED.value
+        )
+
+        val updatedToDo = todoToDoDatabaseHandler.update(body.toDto(), todo.id!!)
         assertEquals(body.description, updatedToDo.description)
         assertEquals(body.status, updatedToDo.status)
     }
@@ -72,9 +82,15 @@ class TodoToDoDatabaseHandlerTest : PassTestBase() {
 
     @Test
     fun `update should fail given invalid todoId`() = runBlocking {
-        val original = todoToDoRepository.save(EntityGenerator.createTodo())
+        val user = userUserRepository.save(EntityGenerator.createUser())
 
-        val body = original.copy(
+        val todo = todoToDoRepository.save(
+            EntityGenerator.createTodo().copy(
+                user = user
+            )
+        )
+
+        val body = todo.copy(
             description = "Assignment 2",
             status = "On going",
         )
@@ -83,7 +99,7 @@ class TodoToDoDatabaseHandlerTest : PassTestBase() {
         val exception = assertFailsWith<ResponseStatusException> {
             todoToDoDatabaseHandler.update(body.toDto(), id)
         }
-        val expectedException = "404 NOT_FOUND \"TodoTodo with ID $id not found\""
+        val expectedException = "404 NOT_FOUND \"TodoToDo with ID 12345 not found\""
         assertEquals(expectedException, exception.message)
     }
 

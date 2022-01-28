@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 
 @Component("user.UserUserHandler")
-class UserUserHandlerImpl : PassDatabaseHandler<UserUserDTO, UserUserRepository>(),
+class UserUserHandlerImpl : PassDatabaseHandler<UserUser, UserUserRepository>(),
         UserUserDatabaseHandler {
     /**
      * Create User: Creates a new User object
@@ -24,12 +24,12 @@ class UserUserHandlerImpl : PassDatabaseHandler<UserUserDTO, UserUserRepository>
 
         val bodyEntity = body.toEntity()
 
-        // Check if the email already exist in the db
+         //Check if the email already exist in the db
         if (repository.doesEmailExist(bodyEntity.email))
             throw ResponseStatusException(HttpStatus.CONFLICT, "Email ${body.email} already exist.")
 
         //save the user using the  UserRepository
-        return repository.save(body)
+        return repository.save(bodyEntity).toDto()
     }
 
     /**
@@ -58,6 +58,6 @@ class UserUserHandlerImpl : PassDatabaseHandler<UserUserDTO, UserUserRepository>
         return repository.save(original.copy(
             name = bodyEntity.name,
             email = bodyEntity.email
-        ))
+        )).toDto()
     }
 }

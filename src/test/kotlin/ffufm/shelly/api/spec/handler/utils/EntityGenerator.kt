@@ -5,7 +5,7 @@ import ffufm.shelly.api.spec.dbo.user.UserUser
 import ffufm.shelly.api.spec.dbo.user.UserUserDTO
 
 object EntityGenerator {
-    fun createUser(): UserUserDTO = UserUserDTO(
+    fun createUser(): UserUser= UserUser(
         name = "Brandon",
         email = "brandon@gmail.com"
     )

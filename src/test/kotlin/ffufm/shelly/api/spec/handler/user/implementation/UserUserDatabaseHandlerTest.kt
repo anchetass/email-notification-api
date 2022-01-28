@@ -21,8 +21,8 @@ class UserUserDatabaseHandlerTest : PassTestBase() {
     @Test
     fun `create should return user`() = runBlocking {
         assertEquals(0, userUserRepository.findAll().count())
-        val user = EntityGenerator.createUser().toDto()
-        val createdUser = userUserDatabaseHandler.create(user)
+        val user = EntityGenerator.createUser()
+        val createdUser = userUserDatabaseHandler.create(user.toDto())
 
         assertEquals(1, userUserRepository.findAll().count())
         assertEquals(user.name, createdUser.name)
@@ -33,13 +33,13 @@ class UserUserDatabaseHandlerTest : PassTestBase() {
     fun `create should return fail given duplicate email`() = runBlocking {
         val user = userUserRepository.save(EntityGenerator.createUser())
         val duplicateUser = user.copy(
-            name = "Brenda",
-            email = "brenda@gmail.com"
+            name = "Brandon",
+            email = "brandon@gmail.com"
         ).toDto()
         val exception = assertFailsWith<ResponseStatusException> {
             userUserDatabaseHandler.create(duplicateUser)
         }
-        val expectedException = "409 CONFLICT \"Email ${duplicateUser.email} already exists!\""
+        val expectedException = "409 CONFLICT \"Email ${duplicateUser.email} already exist.\""
         assertEquals(expectedException, exception.message)
     }
 
@@ -71,9 +71,9 @@ class UserUserDatabaseHandlerTest : PassTestBase() {
         val body= original.copy(
             name = "Brandon",
             email = "brandon@gmail.com",
-        )
+        ).toDto()
 
-        val updatedUser = userUserDatabaseHandler.update(body.toDto(), original.id!!)
+        val updatedUser = userUserDatabaseHandler.update(body, original.id!!)
         assertEquals(body.name, updatedUser.name)
         assertEquals(body.email, updatedUser.email)
     }
@@ -85,11 +85,11 @@ class UserUserDatabaseHandlerTest : PassTestBase() {
         val body = original.copy(
             name = "Brandon",
             email = "brandon@gmail.com",
-        )
+        ).toDto()
 
         val id : Long = 123
         val exception = assertFailsWith<ResponseStatusException> {
-            userUserDatabaseHandler.update(body.toDto(), id)
+            userUserDatabaseHandler.update(body, id)
         }
         val expectedException = "404 NOT_FOUND \"UserUser with ID $id not found\""
         assertEquals(expectedException, exception.message)

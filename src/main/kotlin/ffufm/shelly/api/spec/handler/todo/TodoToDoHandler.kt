@@ -24,7 +24,7 @@ interface TodoToDoDatabaseHandler {
      * Create ToDo: Creates a new ToDo object
      * HTTP Code 201: The created ToDo
      */
-    suspend fun create(body: TodoToDoDTO): TodoToDoDTO
+    suspend fun create(body: TodoToDoDTO, id: Long): TodoToDoDTO
 
     /**
      * Get all ToDos by page: Returns all ToDos from the system that the user has access to. The
@@ -56,10 +56,10 @@ class TodoToDoHandler : PassMvcHandler() {
      * Create ToDo: Creates a new ToDo object
      * HTTP Code 201: The created ToDo
      */
-    @RequestMapping(value = ["/todos/"], method = [RequestMethod.POST])
-    suspend fun create(@RequestBody body: TodoToDoDTO): ResponseEntity<*> {
+    @RequestMapping(value = ["/todos/{id:\\d+}/"], method = [RequestMethod.POST])
+    suspend fun create(@RequestBody body: TodoToDoDTO, @PathVariable id: Long): ResponseEntity<*> {
         body.validateOrThrow()
-        return success { databaseHandler.create(body) }
+        return success { databaseHandler.create(body, id) }
     }
 
     /**
